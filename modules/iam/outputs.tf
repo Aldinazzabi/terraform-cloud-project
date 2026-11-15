@@ -1,0 +1,19 @@
+output "ec2_role_arn" {
+  description = "ARN of the EC2 IAM role"
+  value       = aws_iam_role.ec2.arn
+}
+
+output "ec2_instance_profile_name" {
+  description = "Name of the EC2 instance profile"
+  value       = aws_iam_instance_profile.ec2.name
+}
+
+output "github_actions_role_arn" {
+  description = "ARN of the GitHub Actions OIDC role"
+  value       = aws_iam_role.github_actions.arn
+}
+
+output "github_oidc_provider_arn" {
+  description = "ARN of the GitHub OIDC provider"
+  value       = aws_iam_openid_connect_provider.github.arn
+}

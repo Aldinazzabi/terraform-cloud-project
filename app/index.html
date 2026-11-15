@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cloud Project</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f4f6f9; }
+    h1 { color: #142b45; }
+    p { color: #5d6878; font-size: 18px; }
+    .badge { display: inline-block; background: #1769aa; color: white; padding: 8px 16px; border-radius: 20px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Terraform Cloud Project</h1>
+  <p>AWS • Terraform • Docker • CI/CD</p>
+  <p>Hostname: <strong id="hostname">loading...</strong></p>
+  <div class="badge">Deployed via GitHub Actions + ECR</div>
+  <script>
+    fetch('/hostname').then(r => r.text()).then(t => {
+      document.getElementById('hostname').textContent = t;
+    }).catch(() => {
+      document.getElementById('hostname').textContent = window.location.hostname;
+    });
+  </script>
+</body>
+</html>
