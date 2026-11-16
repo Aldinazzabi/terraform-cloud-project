@@ -83,3 +83,7 @@ output "asg_name" {
   description = "Name of the Auto Scaling Group"
   value       = module.compute.asg_name
 }
+output "storage_bucket_name" {
+  description = "Name of the application storage bucket"
+  value       = module.storage.bucket_name
+}

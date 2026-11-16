@@ -1,3 +1,12 @@
+terraform {
+  backend "s3" {
+    bucket       = "cloud-project-tfstate-201679117202"
+    key          = "dev/terraform.tfstate"
+    region       = "us-east-1"
+    encrypt      = true
+    use_lockfile = true
+  }
+}
 data "aws_caller_identity" "current" {}
 locals {
   common_tags = {
@@ -80,4 +89,10 @@ module "compute" {
   aws_account_id        = data.aws_caller_identity.current.account_id
   ecr_repo_name         = "cloud-project-dev-app"
   docker_image_tag      = "latest"
+}
+module "storage" {
+  source = "../../modules/storage"
+
+  bucket_name = "${var.project_name}-${var.environment}-storage-${data.aws_caller_identity.current.account_id}"
+  tags        = local.common_tags
 }

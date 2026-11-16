@@ -1,0 +1,107 @@
+name: Terraform CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+
+permissions:
+  contents: read
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: environments/dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.2"
+
+      - name: Terraform Format
+        working-directory: .
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: github.event.inputs.action != 'apply'
+        run: terraform plan -input=false -no-color -out=tfplan
+
+      - name: Create readable plan
+        if: always()
+        run: |
+          if [ -f tfplan ]; then
+            terraform show -no-color tfplan > plan.txt
+          fi
+
+      - name: Upload plan artifact
+        if: always() && hashFiles('environments/dev/plan.txt') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-dev-plan
+          path: environments/dev/plan.txt
+          retention-days: 5
+
+  terraform-apply:
+    name: Terraform Apply (Manual)
+    needs: terraform-plan
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
+    runs-on: ubuntu-latest
+    environment: production 
+    defaults:
+      run:
+        working-directory: environments/dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.2"
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false
