@@ -11,16 +11,12 @@
   </style>
 </head>
 <body>
-  <h1>Terraform Cloud Project</h1>
+  <h1>🚀 Terraform Cloud Project</h1>
   <p>AWS • Terraform • Docker • CI/CD</p>
   <p>Hostname: <strong id="hostname">loading...</strong></p>
   <div class="badge">Deployed via GitHub Actions + ECR</div>
   <script>
-    fetch('/hostname').then(r => r.text()).then(t => {
-      document.getElementById('hostname').textContent = t;
-    }).catch(() => {
-      document.getElementById('hostname').textContent = window.location.hostname;
-    });
+    document.getElementById('hostname').textContent = window.location.hostname;
   </script>
 </body>
 </html>
