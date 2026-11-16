@@ -14,13 +14,13 @@ resource "aws_db_subnet_group" "this" {
 # RDS instance (PostgreSQL, Single-AZ, private)
 # -----------------------------------------------------------------------------
 resource "aws_db_instance" "this" {
-  identifier             = "${var.project_name}-${var.environment}-db"
-  engine                 = "postgres"
-  engine_version         = "15"
-  instance_class         = var.db_instance_class
-  allocated_storage      = var.db_allocated_storage
-  storage_type           = "gp2"
-  storage_encrypted      = true
+  identifier        = "${var.project_name}-${var.environment}-db"
+  engine            = "postgres"
+  engine_version    = "15"
+  instance_class    = var.db_instance_class
+  allocated_storage = var.db_allocated_storage
+  storage_type      = "gp2"
+  storage_encrypted = true
 
   db_name  = var.db_name
   username = var.db_username
